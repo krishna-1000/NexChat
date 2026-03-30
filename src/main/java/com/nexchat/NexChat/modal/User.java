@@ -1,14 +1,20 @@
 package com.nexchat.NexChat.modal;
 
 import jakarta.persistence.*;
-import org.springframework.stereotype.Repository;
-
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -16,18 +22,20 @@ public class User {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private  String username;
+    private String username;
 
     @Column(unique = true, nullable = false)
-    private  String email;
+    private String email;
 
     @Column(nullable = false)
-    private  String password;
+    private String password;
 
-    private  String profilePictureUrl;
+    private String profilePictureUrl;
 
 
     private boolean isOnline = false;
+
+    private String role = "USER";
 
 
     private Date lastSeen;
@@ -41,5 +49,5 @@ public class User {
 
 
 
-  
+
 }
