@@ -1,4 +1,4 @@
-package com.nexchat.NexChat.dto.request.authrequest;
+package com.nexchat.NexChat.modal.dto.request.authrequest;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.nexchat.NexChat.dto.response.security;
+package com.nexchat.NexChat.modal.dto.response.security;
 
 import lombok.Getter;
 import lombok.Setter;

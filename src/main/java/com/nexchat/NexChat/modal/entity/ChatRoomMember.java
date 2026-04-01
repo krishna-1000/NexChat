@@ -1,12 +1,12 @@
-package com.nexchat.NexChat.modal;
+package com.nexchat.NexChat.modal.entity;
 
 import jakarta.persistence.*;
-
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "chat_room_members",
 uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "chatroom_id"})})
 public class ChatRoomMember {

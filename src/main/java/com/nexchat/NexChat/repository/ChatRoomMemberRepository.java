@@ -1,6 +1,6 @@
 package com.nexchat.NexChat.repository;
 
-import com.nexchat.NexChat.modal.ChatRoomMember;
+import com.nexchat.NexChat.modal.entity.ChatRoomMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,7 +1,7 @@
 package com.nexchat.NexChat.controller;
 
-import com.nexchat.NexChat.dto.request.authrequest.LoginRequest;
-import com.nexchat.NexChat.modal.User;
+import com.nexchat.NexChat.modal.dto.request.authrequest.LoginRequest;
+import com.nexchat.NexChat.modal.entity.User;
 import com.nexchat.NexChat.security.JwtUtil;
 import com.nexchat.NexChat.service.AuthService;
 import org.springframework.http.HttpStatus;

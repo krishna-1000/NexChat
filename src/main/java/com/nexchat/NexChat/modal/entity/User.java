@@ -1,4 +1,4 @@
-package com.nexchat.NexChat.modal;
+package com.nexchat.NexChat.modal.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,6 +36,7 @@ public class User {
     private boolean isOnline = false;
 
     private String role = "USER";
+
 
 
     private Date lastSeen;
