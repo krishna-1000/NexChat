@@ -11,8 +11,8 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
-    private UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public  UserService (UserMapper userMapper,UserRepository userRepository){
         this.userRepository = userRepository;

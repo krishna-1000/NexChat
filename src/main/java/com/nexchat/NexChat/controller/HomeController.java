@@ -24,8 +24,5 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/users")
-    public List<User> getUsers(){
-        return userRepository.findAll();
-    }
+
 }
