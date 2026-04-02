@@ -42,7 +42,7 @@ public class User {
     private Date lastSeen;
     private final Date createdAt = new Date();
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Message> messages = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
