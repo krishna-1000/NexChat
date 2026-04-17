@@ -22,17 +22,19 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true,nullable = false)
     private String name;
     private boolean isprivate = true;
     private Long createdAt = new Date().getTime();
 
     @Column(nullable = false)
-    private Long createdBy;
+    private String createdBy;
 
-    @OneToMany(mappedBy = "chatRoom")
+    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<ChatRoomMember> members = new HashSet<>();
 
     @OneToMany(mappedBy = "chatRoom" , cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sentAt ASC")
     private Set<Message> messages = new HashSet<>();
 
 

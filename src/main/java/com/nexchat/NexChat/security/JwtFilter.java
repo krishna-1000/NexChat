@@ -30,20 +30,31 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
 
+        // 1. Skip if it's a preflight request
+        String path = request.getRequestURI();
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+        if (path.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String authHeader = request.getHeader("Authorization");
         String token = "";
         String username = "";
 
-        if (authHeader != null && authHeader.startsWith("Bearer")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
             try {
-                username = jwtUtil.extractUsername(token);
+                if (!token.isEmpty()) {
+                    username = jwtUtil.extractUsername(token);
+                }
             } catch (Exception e) {
-                System.out.println("Validation error");
+                e.printStackTrace();
             }
-        }
-        else{
-            filterChain.doFilter(request,response);
+        } else {
+            filterChain.doFilter(request, response);
             return;
         }
 

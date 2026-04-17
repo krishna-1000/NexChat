@@ -11,12 +11,12 @@ import java.util.Date;
 @Builder
 public class UserResponse {
 
-    private final Date createdAt = new Date();
+    private Date createdAt;
     private Long id;
     private String username;
     private String email;
     private String profilePictureUrl;
-    private boolean isOnline = false;
+    private boolean isOnline;
     private String role;
     private Date lastSeen;
 }

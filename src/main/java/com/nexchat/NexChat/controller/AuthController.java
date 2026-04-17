@@ -1,6 +1,8 @@
 package com.nexchat.NexChat.controller;
 
 import com.nexchat.NexChat.modal.dto.request.authrequest.LoginRequest;
+import com.nexchat.NexChat.modal.dto.request.authrequest.SignupRequest;
+import com.nexchat.NexChat.modal.dto.response.LoginResponse;
 import com.nexchat.NexChat.modal.entity.User;
 import com.nexchat.NexChat.security.JwtUtil;
 import com.nexchat.NexChat.service.AuthService;
@@ -33,12 +35,13 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> SingUp(@RequestBody User user) {
+    public ResponseEntity<?> SingUp(@RequestBody SignupRequest signupRequest) {
         try {
-            if (user == null) {
+            if (signupRequest == null) {
                 return ResponseEntity.ok("User is Null");
             }
-            return ResponseEntity.ok(authService.signUp(user));
+
+            return ResponseEntity.ok(authService.signUp(signupRequest));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.toString());
         }
@@ -54,9 +57,10 @@ public class AuthController {
 
 
             String token = jwtUtil.generateToken(loginRequest.getUsername());
+            LoginResponse loginResponse = new LoginResponse(authentication.getName(),token);
 
 
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(loginResponse);
 
 
         } catch (AuthenticationException e){
