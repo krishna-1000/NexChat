@@ -11,6 +11,7 @@ import java.util.List;
 public interface MessageMapper {
 
     @Mapping(source = "sender.id",target = "senderId")
+    @Mapping(source = "sender.username",target = "senderName")
     ChatMessageResponse toResponse(Message message);
 
     List<ChatMessageResponse> toResponseList(List<Message> message);

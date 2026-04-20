@@ -16,4 +16,5 @@ public class ChatMessageResponse {
     private String fileName;
     private LocalDateTime sentAt;
     private Long senderId;
+    private String senderName;
 }

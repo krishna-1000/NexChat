@@ -38,13 +38,25 @@ public class UserController {
         }
         return ResponseEntity.ok(userResponses);
     }
+    @GetMapping("/groups/{userId}")
+    public ResponseEntity<List<GroupResponse>> getAllGroups(@PathVariable("userId") Long userId) {
+        List<GroupResponse> groupResponse = userService.getAllGroups(userId);
+        if (groupResponse.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(groupResponse);
+    }
+
 
     @GetMapping("/room/private/{id}")
     public ResponseEntity<ChatRoomResponse> getPrivateChatRoom(@PathVariable("id") Long userB) {
-        Long userA = securityService.getCurrentUserId();
-        ChatRoomResponse chatroom = chatService.getCommonRoom(userA, userB);
-        return ResponseEntity.ok(chatroom);
-
+        try {
+            Long userA = securityService.getCurrentUserId();
+            ChatRoomResponse chatroom = chatService.getCommonRoom(userA, userB);
+            return ResponseEntity.ok(chatroom);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @PostMapping("/room/group")
@@ -60,4 +72,22 @@ public class UserController {
 
     }
 
+    @GetMapping("/room/{id}")
+    public ResponseEntity<ChatRoomResponse> getGroup(@PathVariable("id") Long groupId) {
+        ChatRoomResponse chatroom = chatService.getGroup(groupId);
+        return ResponseEntity.ok(chatroom);
+
+    }
+
+    @DeleteMapping("/room/{id}")
+    public  String deleteGroup(@PathVariable("id") Long groupId){
+
+        return chatService.deleteGroup(groupId);
+
+    }
+
+    @DeleteMapping("room/{groupId}/{memberId}")
+    public String exitFromGroup(@PathVariable("groupId") Long groupId,@PathVariable("memberId") Long memberId){
+       return chatService.deleteMemberFromGroup(memberId,groupId);
+    }
 }

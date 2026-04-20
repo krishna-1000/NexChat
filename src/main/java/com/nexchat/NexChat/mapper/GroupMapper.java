@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Mapper(componentModel = "spring")
@@ -17,6 +18,8 @@ public interface GroupMapper {
     @Mapping(source = "name",target = "groupName")
     @Mapping(source = "id",target = "groupId")
     GroupResponse toResponse(ChatRoom chatRoom);
+
+    List<GroupResponse> toResponseList(List<ChatRoom> chatRooms);
 
 
 }

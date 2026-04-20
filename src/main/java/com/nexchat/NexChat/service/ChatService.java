@@ -15,22 +15,18 @@ import com.nexchat.NexChat.repository.ChatRoomMemberRepository;
 import com.nexchat.NexChat.repository.ChatRoomRepository;
 import com.nexchat.NexChat.repository.MessageRepository;
 import com.nexchat.NexChat.repository.UserRepository;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ChatService {
 
     private final UserRepository userRepository;
-    private  final ChatRoomMapper chatRoomMapper;
+    private final ChatRoomMapper chatRoomMapper;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
@@ -48,12 +44,12 @@ public class ChatService {
     }
 
 
-    public ChatRoomResponse getCommonRoom(Long userA,Long userB) {
+    public ChatRoomResponse getCommonRoom(Long userA, Long userB) {
 
-        Long chatRoomId =  chatRoomMemberRepository.findPrivateChatRoomId(userA, userB).orElseGet(() -> createChatRoom(userA, userB));
+        Long chatRoomId = chatRoomMemberRepository.findPrivateChatRoomId(userA, userB).orElseGet(() -> createChatRoom(userA, userB));
 
-        ChatRoom chatRoom =  chatRoomRepository.findById(chatRoomId).orElseThrow(()->new UsernameNotFoundException("Chat room not exist"));
-        return  chatRoomMapper.toResponse(chatRoom);
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new UsernameNotFoundException("Chat room not exist"));
+        return chatRoomMapper.toResponse(chatRoom);
 
     }
 
@@ -64,7 +60,7 @@ public class ChatService {
         ChatRoom chatRoom1 = new ChatRoom();
         chatRoom1.setCreatedBy(user1.getUsername());
         chatRoom1.setName("User" + userA + "_" + "user" + userB + "_" + "room");
-        chatRoom1.setIsprivate(true);
+        chatRoom1.setPrivateRoom(true);
         ChatRoom savedRoom = chatRoomRepository.save(chatRoom1);
 
         ChatRoomMember member1 = new ChatRoomMember();
@@ -83,10 +79,10 @@ public class ChatService {
 
     }
 
-    public ChatMessageResponse sendMessage(Long chatroomId,String content,String username){
+    public ChatMessageResponse sendMessage(Long chatroomId, String content, String username) {
         try {
-                ChatRoom chatRoom = chatRoomRepository.findById(chatroomId).orElseThrow(()->new UsernameNotFoundException("Chat room not exist"));
-                User sender = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("Sender Not Found"));
+            ChatRoom chatRoom = chatRoomRepository.findById(chatroomId).orElseThrow(() -> new UsernameNotFoundException("Chat room not exist"));
+            User sender = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Sender Not Found"));
 
             Message message = new Message();
             message.setContent(content);
@@ -102,16 +98,69 @@ public class ChatService {
         }
     }
 
-    public GroupResponse createGroup(GroupRequest groupRequest){
+    public GroupResponse createGroup(GroupRequest groupRequest) {
+
+        List<User> membersList = new ArrayList<>();
+        User admin = userRepository.findByUsername(groupRequest.getAdminName()).orElseThrow(()->new UsernameNotFoundException("Admin not found"));
+        membersList.add(admin);
+        if (groupRequest.getMembers() != null && !groupRequest.getMembers().isEmpty()) {
+
+            for (Long userId : groupRequest.getMembers()) {
+                User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+                if (user != null) {
+                    membersList.add(user);
+                }
+            }
+        }
 
 
         ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setIsprivate(false);
+        chatRoom.setPrivateRoom(false);
         chatRoom.setCreatedBy(groupRequest.getAdminName());
         chatRoom.setName(groupRequest.getGroupName());
-
-
         ChatRoom savedGroup = chatRoomRepository.save(chatRoom);
+
+
+        if (!membersList.isEmpty()) {
+            for (User user : membersList) {
+                ChatRoomMember member = new ChatRoomMember();
+                member.setUser(user);
+                member.setChatRoom(savedGroup);
+                chatRoomMemberRepository.save(member);
+            }
+        }
+
         return groupMapper.toResponse(savedGroup);
+    }
+
+    public ChatRoomResponse getGroup(Long groupId) {
+
+        ChatRoom chatRoom = chatRoomRepository.findById(groupId).orElseThrow(()->new UsernameNotFoundException("Group Not found"));
+
+        return chatRoomMapper.toResponse(chatRoom);
+    }
+
+    public String deleteGroup(Long groupId){
+        if(groupId == null){
+            return "Group id is not valid";
+        }
+       chatRoomRepository.deleteById(groupId);
+        return "Group Deleted Successfully";
+    }
+
+    public String deleteMemberFromGroup(Long memberId,Long groupId){
+        if(memberId == null || groupId == null){
+            return "invalid group or member id";
+        }
+        try {
+            User user = userRepository.findById(memberId).orElseThrow(()->new UsernameNotFoundException("Member not exist"));
+            chatRoomMemberRepository.exitMember(memberId,groupId);
+            return "Exit successfully from group";
+
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 }

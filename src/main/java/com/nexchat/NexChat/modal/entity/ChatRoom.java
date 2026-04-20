@@ -24,7 +24,7 @@ public class ChatRoom {
 
     @Column(unique = true,nullable = false)
     private String name;
-    private boolean isprivate = true;
+    private boolean privateRoom = true;
     private Long createdAt = new Date().getTime();
 
     @Column(nullable = false)

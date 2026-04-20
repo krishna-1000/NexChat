@@ -20,6 +20,6 @@ public class ChatRoomResponse {
     private String name;
     private boolean isprivate;
     private Long createdAt;
-    private Long createdBy;
+    private String createdBy;
     private List<ChatMessageResponse> messages;
 }
