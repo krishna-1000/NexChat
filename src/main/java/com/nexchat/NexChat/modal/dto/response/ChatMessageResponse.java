@@ -1,4 +1,4 @@
-package com.nexchat.NexChat.modal.dto.request.websocket;
+package com.nexchat.NexChat.modal.dto.response;
 import lombok.*;
 
 import java.time.LocalDateTime;

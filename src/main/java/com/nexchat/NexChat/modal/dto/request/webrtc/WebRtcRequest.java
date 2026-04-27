@@ -9,9 +9,10 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class WebRtcRequest {
+public class  WebRtcRequest {
     private String sender;
     private String targetUser;
     private String type;
     private Object data;
+    private String callType;
 }

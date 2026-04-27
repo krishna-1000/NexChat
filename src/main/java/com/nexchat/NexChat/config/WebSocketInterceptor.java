@@ -3,6 +3,7 @@ package com.nexchat.NexChat.config;
 import com.nexchat.NexChat.security.JwtUtil;
 import com.nexchat.NexChat.service.CustomeUserDetailsService;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
@@ -15,15 +16,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class WebSocketInterceptor implements ChannelInterceptor {
 
     private final JwtUtil jwtUtil;
     private final CustomeUserDetailsService customeUserDetailsService;
 
-    public WebSocketInterceptor(JwtUtil jwtUtil, CustomeUserDetailsService customeUserDetailsService) {
-        this.jwtUtil = jwtUtil;
-        this.customeUserDetailsService = customeUserDetailsService;
-    }
 
     @Override
     public  Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -40,7 +38,7 @@ public class WebSocketInterceptor implements ChannelInterceptor {
             String username = jwtUtil.extractUsername(token);
             UserDetails userDetails = customeUserDetailsService.loadUserByUsername(username);
 
-            if(username == null || !jwtUtil.validateToken(token,userDetails)){
+            if(!jwtUtil.validateToken(token,userDetails)){
                 throw new MessagingException("Invalid JWT token");
             }
 

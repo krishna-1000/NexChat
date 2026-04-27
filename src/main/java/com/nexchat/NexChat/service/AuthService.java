@@ -1,10 +1,12 @@
 package com.nexchat.NexChat.service;
 
+import com.nexchat.NexChat.exception.InvalidActionException;
+import com.nexchat.NexChat.exception.UserAlreadyExistsException;
 import com.nexchat.NexChat.mapper.SignupMapper;
 import com.nexchat.NexChat.modal.dto.request.authrequest.SignupRequest;
 import com.nexchat.NexChat.modal.entity.User;
 import com.nexchat.NexChat.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,20 +24,29 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String signUp(SignupRequest signupRequest) {
+    @Transactional
+    public void signUp(SignupRequest signupRequest) {
 
-        try {
-            if (signupRequest.getUsername().isEmpty() || signupRequest.getPassword().isEmpty() || signupRequest.getEmail().isEmpty()) {
-                return "Username or password is empty";
+            if (signupRequest.getUsername().isBlank() ||
+                    signupRequest.getPassword().isBlank() ||
+                    signupRequest.getEmail().isBlank() ) {
+               throw new InvalidActionException("Required field are missing");
+            }
+            boolean isUserExist = userRepository.existsByEmail(signupRequest.getEmail());
+            boolean isUserNameExist = userRepository.existsByUsername(signupRequest.getUsername());
+
+            if(isUserExist){
+                throw new UserAlreadyExistsException("Email is already registered");
+            }
+            if(isUserNameExist){
+                throw new UserAlreadyExistsException("Username is already taken");
             }
             signupRequest.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
             User user = signupMapper.toEntity(signupRequest);
             userRepository.save(user);
-            return "Signup Successfully";
 
-        } catch (Exception e) {
-            return e.toString();
-        }
+
+
     }
 
 }

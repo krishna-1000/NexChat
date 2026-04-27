@@ -15,8 +15,5 @@ public class UserResponse {
     private Long id;
     private String username;
     private String email;
-    private String profilePictureUrl;
     private boolean isOnline;
-    private String role;
-    private Date lastSeen;
 }

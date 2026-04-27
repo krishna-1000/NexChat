@@ -1,13 +1,8 @@
-package com.nexchat.NexChat.modal.dto.request;
+package com.nexchat.NexChat.modal.dto.response;
 
-import com.nexchat.NexChat.modal.dto.request.websocket.ChatMessageResponse;
-import com.nexchat.NexChat.modal.dto.response.UserResponse;
-import com.nexchat.NexChat.modal.entity.ChatRoomMember;
-import com.nexchat.NexChat.modal.entity.Message;
 import lombok.*;
 
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter

@@ -2,6 +2,7 @@ package com.nexchat.NexChat.repository;
 
 import com.nexchat.NexChat.modal.entity.ChatRoom;
 import com.nexchat.NexChat.modal.entity.ChatRoomMember;
+import com.nexchat.NexChat.modal.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -34,4 +35,6 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     @Modifying
     @Query("delete from ChatRoomMember m where m.user.id = :memberId and m.chatRoom.id = :groupId")
     void exitMember(@Param("memberId") Long memberId,@Param("groupId") Long groupId);
+
+    boolean existsByUserAndChatRoom(User sender,ChatRoom chatRoom);
 }

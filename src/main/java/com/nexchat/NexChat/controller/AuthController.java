@@ -1,5 +1,6 @@
 package com.nexchat.NexChat.controller;
 
+import com.nexchat.NexChat.modal.dto.OtpRequestDto;
 import com.nexchat.NexChat.modal.dto.request.authrequest.LoginRequest;
 import com.nexchat.NexChat.modal.dto.request.authrequest.SignupRequest;
 import com.nexchat.NexChat.modal.dto.response.LoginResponse;
@@ -7,6 +8,8 @@ import com.nexchat.NexChat.modal.entity.User;
 import com.nexchat.NexChat.repository.UserRepository;
 import com.nexchat.NexChat.security.JwtUtil;
 import com.nexchat.NexChat.service.AuthService;
+import com.nexchat.NexChat.service.EmailService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,32 +26,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private  final UserRepository userRepository;
+    private final UserRepository userRepository;
     private final AuthService authService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
 
     public AuthController(UserRepository userRepository, AuthService authService,
                           JwtUtil jwtUtil,
-                          AuthenticationManager authenticationManager
+                          AuthenticationManager authenticationManager, EmailService emailService
     ) {
         this.userRepository = userRepository;
         this.authService = authService;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.emailService = emailService;
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> SingUp(@RequestBody SignupRequest signupRequest) {
-        try {
-            if (signupRequest == null) {
-                return ResponseEntity.ok("User is Null");
-            }
+    public ResponseEntity<?> SingUp(@Valid @RequestBody SignupRequest signupRequest) {
 
-            return ResponseEntity.ok(authService.signUp(signupRequest));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.toString());
-        }
+        authService.signUp(signupRequest);
+        return ResponseEntity.ok("Registered Successfully!");
 
     }
 
@@ -61,15 +60,33 @@ public class AuthController {
 
 
             String token = jwtUtil.generateToken(loginRequest.getUsername());
-            User user = userRepository.findByUsername(authentication.getName()).orElseThrow(()->new UsernameNotFoundException("user"));
-            LoginResponse loginResponse = new LoginResponse(authentication.getName(),token,user.getId());
+            User user = userRepository.findByUsername(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException("user"));
+            LoginResponse loginResponse = new LoginResponse(authentication.getName(), token, user.getId(), user.getEmail(), user.getCreatedAt(), user.getBio());
 
 
             return ResponseEntity.ok(loginResponse);
 
 
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username of password");
         }
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<String> sendOtp(@Valid @RequestBody OtpRequestDto request) {
+
+        emailService.sendOtpToEmail(request.getEmail());
+
+        return ResponseEntity.ok("OTP sent to " + request.getEmail());
+
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> varifyOtp(@Valid @RequestBody OtpRequestDto request) {
+
+        String res = emailService.verifyOtp(request.getEmail(), request.getOtp());
+        return ResponseEntity.ok().body(res);
+
+
     }
 }

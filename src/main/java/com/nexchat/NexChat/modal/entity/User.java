@@ -30,12 +30,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private String profilePictureUrl;
 
 
     private boolean isOnline = false;
 
-    private String role = "USER";
+    private String bio;
 
 
 

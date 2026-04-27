@@ -1,93 +1,124 @@
 package com.nexchat.NexChat.controller;
 
-import com.nexchat.NexChat.modal.dto.request.ChatRoomResponse;
+import com.nexchat.NexChat.exception.InvalidActionException;
+import com.nexchat.NexChat.modal.dto.request.UserUpdateRequest;
+import com.nexchat.NexChat.modal.dto.response.ChatRoomResponse;
 import com.nexchat.NexChat.modal.dto.request.GroupRequest;
 import com.nexchat.NexChat.modal.dto.response.GroupResponse;
 import com.nexchat.NexChat.modal.dto.response.UserResponse;
-import com.nexchat.NexChat.modal.entity.ChatRoom;
 import com.nexchat.NexChat.service.ChatService;
 import com.nexchat.NexChat.service.SecurityService;
 import com.nexchat.NexChat.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final SecurityService securityService;
     private final ChatService chatService;
 
-    public UserController(UserService userService, SecurityService securityService, ChatService chatService) {
-        this.userService = userService;
-
-        this.securityService = securityService;
-        this.chatService = chatService;
-    }
 
     @GetMapping("/users")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> userResponses = userService.getAllUsers();
-        if (userResponses.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(userResponses);
+
+        return ResponseEntity.ok(userService.getUsers());
     }
+
     @GetMapping("/groups/{userId}")
     public ResponseEntity<List<GroupResponse>> getAllGroups(@PathVariable("userId") Long userId) {
-        List<GroupResponse> groupResponse = userService.getAllGroups(userId);
-        if (groupResponse.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(groupResponse);
+
+        return ResponseEntity.ok(userService.getGroups(userId));
     }
 
 
-    @GetMapping("/room/private/{id}")
+    @GetMapping("/chat/private/{id}")
     public ResponseEntity<ChatRoomResponse> getPrivateChatRoom(@PathVariable("id") Long userB) {
-        try {
-            Long userA = securityService.getCurrentUserId();
-            ChatRoomResponse chatroom = chatService.getCommonRoom(userA, userB);
-            return ResponseEntity.ok(chatroom);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        Long userA = securityService.getCurrentUserId();
+        if (userB == null || userA == null) {
+            throw new InvalidActionException("user is not valid");
         }
+        return ResponseEntity.ok(chatService.getCommonRoom(userA, userB));
+
     }
 
-    @PostMapping("/room/group")
-    public ResponseEntity<GroupResponse> createGroup(@RequestBody  GroupRequest groupRequest) {
-        System.out.println(groupRequest);
-        if(groupRequest.getGroupName() == null){
-            return  ResponseEntity.unprocessableContent().build();
-        }
-        GroupResponse groupResponse = chatService.createGroup(groupRequest);
+    @PostMapping("/groups")
+    public ResponseEntity<GroupResponse> createGroup(@Valid @RequestBody GroupRequest groupRequest) {
 
-
-        return ResponseEntity.ok(groupResponse);
+        return ResponseEntity.ok(chatService.createGroup(groupRequest));
 
     }
 
     @GetMapping("/room/{id}")
     public ResponseEntity<ChatRoomResponse> getGroup(@PathVariable("id") Long groupId) {
-        ChatRoomResponse chatroom = chatService.getGroup(groupId);
-        return ResponseEntity.ok(chatroom);
+        if(groupId == null){
+            throw new InvalidActionException("Group id is invalid");
+        }
+        return ResponseEntity.ok(chatService.getGroup(groupId));
 
     }
 
     @DeleteMapping("/room/{id}")
-    public  String deleteGroup(@PathVariable("id") Long groupId){
+    public ResponseEntity<String> deleteGroup(@PathVariable("id") Long groupId) {
 
-        return chatService.deleteGroup(groupId);
+        if(groupId == null){
+            throw new InvalidActionException("Group id is Invalid");
+        }
+        chatService.deleteGroup(groupId);
+        return ResponseEntity.ok("Group delete successfully!");
 
     }
 
     @DeleteMapping("room/{groupId}/{memberId}")
-    public String exitFromGroup(@PathVariable("groupId") Long groupId,@PathVariable("memberId") Long memberId){
-       return chatService.deleteMemberFromGroup(memberId,groupId);
+    public String exitFromGroup(@PathVariable("groupId") Long groupId, @PathVariable("memberId") Long memberId) {
+        if(groupId == null || memberId == null){
+            throw  new InvalidActionException("Group or Member is Not valid");
+        }
+        return chatService.deleteMemberFromGroup(memberId, groupId);
     }
+
+    @DeleteMapping("/user/{userId}")
+    public ResponseEntity<String> deleteUserAccount(@PathVariable("userId") Long userId) {
+        try {
+            Long loginUser = securityService.getCurrentUserId();
+
+            if (!Objects.equals(userId, loginUser)) {
+                return ResponseEntity.badRequest().body("You can not delete other user account!");
+            }
+
+            String res = userService.deleteUserAccount(userId);
+
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+//    @PutMapping("/user")
+//    public ResponseEntity<?> updateUser(@Valid @RequestBody UserUpdateRequest request) {
+//        try {
+//
+//            Long loginUserId = securityService.getCurrentUserId();
+//
+//            if (!Objects.equals(request.getId(), loginUserId)) {
+//                return ResponseEntity.badRequest().build();
+//            }
+//
+//            UserResponse res = userService.updateUser(request);
+//
+//            return ResponseEntity.ok(res);
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
+
+
 }

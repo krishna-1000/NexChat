@@ -1,27 +1,25 @@
 package com.nexchat.NexChat.service;
 
+import com.nexchat.NexChat.exception.UnauthorizedException;
 import com.nexchat.NexChat.modal.entity.User;
 import com.nexchat.NexChat.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class SecurityService {
 
-    private UserRepository userRepository;
-
-    public SecurityService(UserRepository userRepository)
-    {
-        this.userRepository = userRepository;
-    }
+    private final UserRepository userRepository;
 
     public Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
+            throw new UnauthorizedException("User is not Longed in");
         }
 
         String username = authentication.getName();
