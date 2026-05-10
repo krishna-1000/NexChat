@@ -30,7 +30,6 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        // 1. Skip if it's a preflight request
         String path = request.getRequestURI();
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -41,8 +40,8 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
         String authHeader = request.getHeader("Authorization");
-        String token = "";
-        String username = "";
+        String token = null;
+        String username = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);

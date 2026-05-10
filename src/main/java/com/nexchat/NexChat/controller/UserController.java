@@ -102,23 +102,4 @@ public class UserController {
         }
     }
 
-//    @PutMapping("/user")
-//    public ResponseEntity<?> updateUser(@Valid @RequestBody UserUpdateRequest request) {
-//        try {
-//
-//            Long loginUserId = securityService.getCurrentUserId();
-//
-//            if (!Objects.equals(request.getId(), loginUserId)) {
-//                return ResponseEntity.badRequest().build();
-//            }
-//
-//            UserResponse res = userService.updateUser(request);
-//
-//            return ResponseEntity.ok(res);
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//    }
-
-
 }

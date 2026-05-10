@@ -30,10 +30,11 @@ public class JwtUtil {
 
     public String generateToken(String username) {
 
+        long ACCESS_TOKEN_EXPIRATION = 1000 * 20;
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
                 .signWith(getSigninKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

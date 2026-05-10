@@ -98,7 +98,7 @@ public class ChatService {
         chatRoom.setName(groupRequest.getGroupName());
         ChatRoom savedGroup = chatRoomRepository.save(chatRoom);
 
-        //Add admin first
+
        saveMember(savedGroup,admin);
 
         if (groupRequest.getMembers() != null) {
